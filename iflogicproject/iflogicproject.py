@@ -27,8 +27,9 @@ def main():
             break
         elif answer == 'no':
             print("Hmmm, let me guess again....")
+            colors.remove(guess)
         elif answer == 'quit':
-            print("Thanks, fr playing with me! Bye!")
+            print("Thanks, for playing with me! Bye!")
             break
         else:
             print("Please respond with a valid  'yes', 'no', or 'quit'.")
