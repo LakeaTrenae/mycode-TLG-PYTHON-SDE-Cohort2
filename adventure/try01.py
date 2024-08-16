@@ -1,7 +1,11 @@
 #!/usr/bin/python3
 
-# Amalfi Coast Adventure Game
-# Objective: Find the black card and enjoy a shopping spree on the Amalfi Coast.
+import os
+
+def clear_screen():
+    """Clear the terminal screen."""
+    os.system("clear")  # For Unix-like systems
+    # os.system("cls")  # Uncomment this line and comment the above line if you are on Windows
 
 def showInstructions():
     # Print the game instructions
@@ -125,36 +129,50 @@ while True:
     # Split the command into action and item/direction
     command = move.split(" ", 1)
 
+    # Check and process the command
+    valid_command = False
+
     if command[0] == 'exit':
         print('Thank you for playing! Goodbye!')
         break
 
     elif command[0] == 'go':
-        if len(command) > 1 and command[1] in rooms[currentRoom]['directions']:
-            nextRoom = rooms[currentRoom][command[1]]
-            # Handle trapdoor
-            if 'trapdoor' in rooms[currentRoom] and rooms[currentRoom]['trapdoor']:
-                if command[1] == 'east' and currentRoom == 'Giant Walk-in Closet':
-                    print('The trapdoor prevents you from going back. You are now in the Elegant Garden.')
-                    currentRoom = nextRoom
+        if len(command) > 1:
+            direction = command[1]
+            if direction in rooms[currentRoom]['directions']:
+                nextRoom = rooms[currentRoom][direction]
+                # Handle trapdoor
+                if 'trapdoor' in rooms[currentRoom] and rooms[currentRoom]['trapdoor']:
+                    if direction == 'east' and currentRoom == 'Giant Walk-in Closet':
+                        print('The trapdoor prevents you from going back. You are now in the Elegant Garden.')
+                        currentRoom = nextRoom
+                    else:
+                        currentRoom = nextRoom
                 else:
                     currentRoom = nextRoom
+                move_count += 1  # Increment move count
+                valid_command = True
             else:
-                currentRoom = nextRoom
-            move_count += 1  # Increment move count
+                print('You can\'t go that way!')
+
         else:
-            print('You can\'t go that way!')
+            print('Specify the direction to go!')
 
     elif command[0] == 'get':
-        if len(command) > 1 and "item" in rooms[currentRoom] and command[1] == rooms[currentRoom]['item']:
-            # Special handling for the stack of money
-            if command[1] == 'stack of money':
-                print('You found a stack of money and put it in your purse!')
-            inventory.append(command[1])  # Add item to inventory
-            print(command[1] + ' obtained!')
-            del rooms[currentRoom]['item']  # Remove item from the room
+        if len(command) > 1:
+            item = command[1]
+            if "item" in rooms[currentRoom] and item == rooms[currentRoom]['item']:
+                # Special handling for the stack of money
+                if item == 'stack of money':
+                    print('You found a stack of money and put it in your purse!')
+                inventory.append(item)  # Add item to inventory
+                print(item + ' obtained!')
+                del rooms[currentRoom]['item']  # Remove item from the room
+                valid_command = True
+            else:
+                print('Can\'t get ' + item + '!')
         else:
-            print('Can\'t get ' + command[1] + '!')
+            print('Specify the item to get!')
 
     elif command[0] == 'use':
         if len(command) > 1:
@@ -163,10 +181,18 @@ while True:
                 print('You use the maze key to find a hidden path to the Luxury Villa!')
                 currentRoom = 'Luxury Villa'
                 move_count += 1
+                valid_command = True
             else:
                 print('You can\'t use ' + item + ' here!')
         else:
             print('Specify the item to use.')
+
+    else:
+        print('Unknown command!')
+
+    # Clear the screen only if the command was valid
+    if valid_command:
+        clear_screen()
 
     # Check if player has won
     if currentRoom == 'Luxury Villa' and 'black card' in inventory:
